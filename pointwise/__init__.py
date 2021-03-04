@@ -3,12 +3,26 @@
 # @Time : 2021/2/26 16:56
 # @Author : LYX-夜光
 
-def getDataList(fileName):
+import pandas as pd
+
+def getLETORDatasetByList(fileName):
     with open(fileName, encoding='UTF-8') as readFile:
         readLines = readFile.readlines()
-    x, y = [], []
+    dataList = []
     for readLine in readLines:
         data = readLine.split('#')[0].strip().split(' ')
-        y.append(int(data[0]))
-        x.append([float(data[i].split(':')[1]) for i in range(2, len(data))])
-    return x, y
+        dataCol = [int(data[0]), int(data[1].split(':')[1])]
+        dataCol.extend([float(data[i].split(':')[1]) for i in range(2, len(data))])
+        dataList.append(dataCol)
+    return dataList
+
+def getLETORDatasetByPandas(fileName):
+    dataList = getLETORDatasetByList(fileName)
+    dataset = pd.DataFrame(dataList, columns=['y', 'q']+list(range(46)))
+    return dataset
+
+if __name__ == "__main__":
+    dataset = getLETORDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/train.txt")
+    print(dataset)
+    x = dataset.loc[:, range(46)]
+    print(x.values)
