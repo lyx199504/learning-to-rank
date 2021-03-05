@@ -3,7 +3,7 @@
 # @Time : 2021/2/26 16:56
 # @Author : LYX-夜光
 
-import pointwise
+from initialDataset import LETOR4
 import numpy as np
 from evaluation import NDCG
 import pandas as pd
@@ -15,10 +15,9 @@ class PRank:
         self.w = np.mat([0.] * self.x.shape[1]).T
         self.l = len(set(trainset['y']))
         self.b = np.mat([0.] * (self.l-1) + [float('inf')]).T
-        self.iterNum = 20
 
-    def train(self):
-        for i in range(self.iterNum):
+    def train(self, iterNum=20):
+        for i in range(iterNum):
             count = 0
             for t in range(self.T):
                 wx = float(self.x[t]*self.w)
@@ -59,8 +58,8 @@ class PRank:
 
 
 if __name__ == "__main__":
-    trainset = pointwise.getLETORDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/train.txt")
+    trainset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/train.txt")
     pRank = PRank(trainset)
-    pRank.train()
-    testset = pointwise.getLETORDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/test.txt")
+    pRank.train(iterNum=10)
+    testset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/test.txt")
     pRank.test(testset)
