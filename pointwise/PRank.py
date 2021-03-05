@@ -5,6 +5,8 @@
 
 import pointwise
 import numpy as np
+from evaluation import NDCG
+import pandas as pd
 
 class PRank:
     def __init__(self, trainset):
@@ -13,7 +15,7 @@ class PRank:
         self.w = np.mat([0.] * self.x.shape[1]).T
         self.l = len(set(trainset['y']))
         self.b = np.mat([0.] * (self.l-1) + [float('inf')]).T
-        self.iterNum = 10
+        self.iterNum = 20
 
     def train(self):
         for i in range(self.iterNum):
@@ -43,7 +45,17 @@ class PRank:
                     y_pred.append(r)
                     break
         testset['y_pred'] = y_pred  # 将预测相关度加入测试集
-        print("测试集正确率：%f" % (sum(testset['y'] == testset['y_pred'])/len(x)))
+        print("测试集分类准确率：%f" % (sum(testset['y'] == testset['y_pred'])/len(x)))
+
+        queryList = list(set(testset['q']))
+        testsetByQuery = testset.groupby('q').apply(lambda x: x.sort_values('y_pred', ascending=False))
+        testsetNDCG = pd.DataFrame({'NDCG': [None]*len(queryList)}, index=queryList)
+        k = 1
+        for query in queryList:
+            queryTestset = NDCG.calNDCG(testsetByQuery.loc[query])
+            testsetNDCG.loc[query, 'NDCG'] = queryTestset.iloc[k]['NDCG']
+        testsetNDCG = testsetNDCG['NDCG'].fillna(value=1.0)
+        print("测试集平均NDCG(%d)：%f" % (k, testsetNDCG.mean()))
 
 
 if __name__ == "__main__":

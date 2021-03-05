@@ -11,14 +11,15 @@ def getLETORDatasetByList(fileName):
     dataList = []
     for readLine in readLines:
         data = readLine.split('#')[0].strip().split(' ')
-        dataCol = [int(data[0]), int(data[1].split(':')[1])]
+        dataCol = [int(data[1].split(':')[1])]
         dataCol.extend([float(data[i].split(':')[1]) for i in range(2, len(data))])
+        dataCol.append(int(data[0]))
         dataList.append(dataCol)
     return dataList
 
 def getLETORDatasetByPandas(fileName):
     dataList = getLETORDatasetByList(fileName)
-    dataset = pd.DataFrame(dataList, columns=['y', 'q']+list(range(46)))
+    dataset = pd.DataFrame(dataList, columns=['q']+list(range(46))+['y'])
     return dataset
 
 if __name__ == "__main__":
