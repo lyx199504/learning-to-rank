@@ -51,8 +51,8 @@ class PRank:
         k = 1
         for query in queryList:
             queryTestset = NDCG.calNDCG(testsetByQuery.loc[query])
-            testsetNDCG.loc[query, 'NDCG'] = queryTestset.iloc[k]['NDCG']
-        testsetNDCG = testsetNDCG['NDCG'].fillna(value=1.0)
+            testsetNDCG.loc[query, 'NDCG'] = queryTestset.iloc[k-1]['NDCG']
+        # testsetNDCG = testsetNDCG['NDCG'].fillna(value=1.0)
         print("测试集平均NDCG(%d)：%f" % (k, testsetNDCG.mean()))
 
 
