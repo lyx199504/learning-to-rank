@@ -9,11 +9,11 @@ from evaluation import NDCG
 import pandas as pd
 
 class PRank:
-    def __init__(self, trainset):
-        self.x, self.y = np.mat(trainset.loc[:, range(46)]), np.mat(trainset['y']).T
+    def __init__(self, x, y):
+        self.x, self.y = np.mat(x), np.mat(y).T
         self.T = self.x.shape[0]
         self.w = np.mat([0.] * self.x.shape[1]).T
-        self.l = len(set(trainset['y']))
+        self.l = len(set(y))
         self.b = np.mat([0.] * (self.l-1) + [float('inf')]).T
 
     def train(self, iterNum=20):
@@ -33,9 +33,8 @@ class PRank:
                         break
             print("第%d轮训练，精度为：%f" % (i+1, count/self.T))
 
-    def test(self, testset):
+    def test(self, testset, x):
         # 预测测试集的相关度
-        x = testset.loc[:, range(46)]
         y_pred = []
         for t in x.index:
             wx = float(np.mat(x.loc[t].values) * self.w)
@@ -58,8 +57,10 @@ class PRank:
 
 
 if __name__ == "__main__":
-    trainset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/train.txt")
-    pRank = PRank(trainset)
-    pRank.train(iterNum=10)
-    testset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/test.txt")
-    pRank.test(testset)
+    trainset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold5/train.txt")
+    x, y = trainset[range(46)], trainset['y']
+    pRank = PRank(x, y)
+    pRank.train(iterNum=5)
+    testset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold5/test.txt")
+    testset, x = testset[['q', 'y']], testset[range(46)]
+    pRank.test(testset, x)

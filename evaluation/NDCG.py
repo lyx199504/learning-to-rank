@@ -4,8 +4,8 @@
 # @Author : LYX-夜光
 
 import numpy as np
-import pointwise
 import pandas as pd
+from initialDataset import LETOR4
 
 def calNDCG(dataset):
     # 输入的dataset是每个query对应的文档数据
@@ -26,8 +26,8 @@ def calNDCG(dataset):
     return dataset
 
 if __name__ == "__main__":
-    trainset = pointwise.getLETORDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/train.txt")
-    print(trainset)
+    trainset = LETOR4.getDatasetByPandas("../datasets/LETOR4/MQ2007/Fold1/train.txt")
+    trainset = trainset[['q', 'y']]
     d = trainset.groupby('q').apply(lambda x: x.sort_values('y', ascending=False))
     data = calNDCG(d.loc[10])
     print(data)
